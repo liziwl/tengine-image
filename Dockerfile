@@ -1,7 +1,8 @@
+ARG VER=2.4.0
 FROM alpine:3.17
 
-
-ENV TENGINE_VERSION 2.4.0
+ARG VER=2.4.0
+ENV TENGINE_VERSION=${VER}
 
 # nginx: https://git.io/vSIyj
 
@@ -54,7 +55,7 @@ ENV CONFIG "\
         --with-http_v2_module \
         --add-module=modules/ngx_http_upstream_check_module \
         --add-module=modules/headers-more-nginx-module-0.33 \
-	--add-module=modules/ngx_http_upstream_session_sticky_module \
+        --add-module=modules/ngx_http_upstream_session_sticky_module \
         "
 RUN     addgroup -S nginx \
         && adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx nginx \
@@ -71,6 +72,7 @@ RUN     addgroup -S nginx \
                 libxslt-dev \
                 gd-dev \
                 geoip-dev \
+                tar \
         && curl -L "https://github.com/alibaba/tengine/archive/$TENGINE_VERSION.tar.gz" -o tengine.tar.gz \
         && mkdir -p /usr/src \
         && tar -zxC /usr/src -f tengine.tar.gz \
@@ -78,9 +80,9 @@ RUN     addgroup -S nginx \
         && cd /usr/src/tengine-$TENGINE_VERSION \
         && curl -L "https://github.com/openresty/headers-more-nginx-module/archive/v0.33.tar.gz" -o more.tar.gz \
         && tar -zxC /usr/src/tengine-$TENGINE_VERSION/modules -f more.tar.gz \
-	&& rm  more.tar.gz \
-	&& ls -l /usr/src/tengine-$TENGINE_VERSION/modules \
-	&& ./configure $CONFIG --with-debug \
+        && rm  more.tar.gz \
+        && ls -l /usr/src/tengine-$TENGINE_VERSION/modules \
+        && ./configure $CONFIG --with-debug \
         && make -j$(getconf _NPROCESSORS_ONLN) \
         && mv objs/nginx objs/nginx-debug \
         && mv objs/ngx_http_xslt_filter_module.so objs/ngx_http_xslt_filter_module-debug.so \
