@@ -1,4 +1,3 @@
-ARG VER=2.4.0
 FROM alpine:3.17
 
 ARG VER=2.4.0
