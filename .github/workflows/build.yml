@@ -1,11 +1,17 @@
 name: Build Docker Image
 
 on:
+  # 手动触发事件
   workflow_dispatch:
+    inputs:
+      tengineVersion:
+        description: 'Tengine version'
+        required: true
+        default: '2.4.0'
 
 env:
   REGISTRY: ghcr.io
-  IMAGE: liziwl/tegine-proxy
+  IMAGE: liziwl/tengine-proxy
 
 jobs:
   build-and-push:
@@ -34,7 +40,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE }}
-          # tags: ${{ matrix.texlive }}
+          tags: ${{ github.event.inputs.tengineVersion }}
 
       # 构建并上传
       - name: Build and push
@@ -45,8 +51,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # build-args: |
-          #   TEXLIVE_TAG=${{ matrix.texlive }}
+          build-args: |
+            VER=${{ github.event.inputs.tengineVersion }}
 
       - name: Inspect image
         run: |
